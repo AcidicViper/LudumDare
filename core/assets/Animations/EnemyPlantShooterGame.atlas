@@ -1,0 +1,20 @@
+
+EnemyPlantShooterGame.png
+size: 256,64
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+IDLEANIMATION
+  rotate: false
+  xy: 2, 2
+  size: 128, 32
+  orig: 128, 32
+  offset: 0, 0
+  index: -1
+RUNNINGANIMATION
+  rotate: false
+  xy: 132, 2
+  size: 96, 32
+  orig: 96, 32
+  offset: 0, 0
+  index: -1

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.3.3" orientation="orthogonal" renderorder="right-down" width="64" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="3">
+ <tileset firstgid="1" source="LdTileSet.tsx"/>
+ <layer id="1" name="Art" width="64" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztx7ENADAIA7CA+v/N/YN48OBNsgAAAAAAnPbKT58BgEIfWrUOYQ==
+  </data>
+ </layer>
+ <objectgroup id="2" name="Ground">
+  <object id="1" x="0" y="800" width="2050" height="220"/>
+ </objectgroup>
+</map>
