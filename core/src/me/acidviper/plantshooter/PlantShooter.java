@@ -7,12 +7,16 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import me.acidviper.plantshooter.screens.GameScreen;
 
 public class PlantShooter extends Game {
 	public SpriteBatch batch;
-	BitmapFont font;
+	public BitmapFont font;
 	public static final float PPM = 100;
+
+	FreeTypeFontGenerator generator;
+	FreeTypeFontGenerator.FreeTypeFontParameter parameter;
 
 	@Override
 	public void create () {
@@ -20,6 +24,11 @@ public class PlantShooter extends Game {
 		font = new BitmapFont();
 
 		setScreen(new GameScreen(this));
+
+		generator = new FreeTypeFontGenerator(Gdx.files.internal("Font.ttf"));
+		parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		parameter.size = 5;
+		font = generator.generateFont(parameter);
 	}
 
 	@Override

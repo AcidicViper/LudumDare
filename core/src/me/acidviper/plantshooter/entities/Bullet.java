@@ -17,8 +17,11 @@ public class Bullet extends Sprite {
 
     public Body body;
     public TextureRegion bulletImage;
+    GameScreen screen;
+    public int lastX;
 
-    public  Bullet(float x, float y, boolean facingRight, World world) {
+    public  Bullet(float x, float y, boolean facingRight, World world, GameScreen screen) {
+        this.screen = screen;
         this.world = world;
         this.facingRight = facingRight;
 
@@ -38,6 +41,8 @@ public class Bullet extends Sprite {
         FixtureDef fdef = new FixtureDef();
         PolygonShape shape = new PolygonShape();
         shape.setAsBox((getTexture().getWidth() / 2f) / PlantShooter.PPM, (getTexture().getHeight() / 2f) / PlantShooter.PPM ) ;
+        fdef.filter.categoryBits = screen.CATEGORY_BULLETS;
+        fdef.filter.maskBits = screen.CATEGORY_MONSTER;
         fdef.shape = shape;
 
         body.createFixture(fdef);
@@ -45,6 +50,7 @@ public class Bullet extends Sprite {
         setPosition( (body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2));
     }
     public void update(float dt) {
+
         setPosition( (body.getPosition().x - getWidth() / 2) - (1 / PlantShooter.PPM)  + .05f, (body.getPosition().y - getHeight() / 2)  - ( 2 / PlantShooter.PPM));
         if (facingRight) { body.setLinearVelocity(3f , 0f); } else { body.setLinearVelocity(-3f , 0f); }
     }

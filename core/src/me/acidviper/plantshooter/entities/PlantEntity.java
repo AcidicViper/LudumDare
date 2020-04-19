@@ -6,14 +6,17 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import me.acidviper.plantshooter.PlantShooter;
+import me.acidviper.plantshooter.screens.GameScreen;
 
 public class PlantEntity extends Sprite {
     public Body body;
     public int health = 15;
+    public int currentShield;
 
     TextureRegion plantIdle;
-
-    public PlantEntity(int x,int y, World world) {
+    GameScreen screen;
+    public PlantEntity(int x, int y, World world, GameScreen screen) {
+        this.screen = screen;
         setTexture(new Texture("Sprites/PlantSprite.png"));
         plantIdle = new TextureRegion(getTexture(), 0,0, 124,124);
         setBounds(0,0, 124 * 2 / PlantShooter.PPM, 124 * 2 / PlantShooter.PPM);
@@ -31,6 +34,9 @@ public class PlantEntity extends Sprite {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox((getTexture().getWidth() / 2f) / PlantShooter.PPM, (getTexture().getHeight() / 2f) + 5 / PlantShooter.PPM ) ;
         fdef.shape = shape;
+
+        fdef.filter.categoryBits = (short) (screen.CATEGORY_STATICOBJECTS | screen.CATEGORY_MONSTERSTATICOBJECTS);
+        fdef.filter.maskBits = (short) (screen.CATEGORY_PLAYER | screen.CATEGORY_MONSTER | screen.CATEGORY_BULLETS);
 
         body.createFixture(fdef);
         setPosition( (body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2));

@@ -25,15 +25,16 @@ public class Enemy extends Sprite {
     World world;
     public Body body;
 
-    public Enemy(float x, float y, World world, GameScreen screen) {
+    GameScreen screen;
+
+    public Enemy(float x, float y, World world, GameScreen screen, boolean goLeft) {
         super(screen.getEnemyAtlas().findRegion("IDLEANIMATION"));
-
-
+        this.screen = screen;
         currentState = State.RUNNING;
         previousState = State.RUNNING;
 
         stateTimer = 0;
-        runningRight = true;
+        runningRight = goLeft;
 
         Array<TextureRegion> frames = new Array<>();
         for (int i = 5; i < 7; i++) {
@@ -61,6 +62,8 @@ public class Enemy extends Sprite {
         shape.setRadius(9 / PlantShooter.PPM * 2);
         fdef.shape = shape;
 
+        fdef.filter.categoryBits = screen.CATEGORY_MONSTER;
+        fdef.filter.maskBits = (short) (screen.CATEGORY_MONSTERSTATICOBJECTS & screen.CATEGORY_BULLETS);
         body.createFixture(fdef);
     }
 

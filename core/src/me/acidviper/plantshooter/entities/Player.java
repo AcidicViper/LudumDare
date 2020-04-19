@@ -30,9 +30,11 @@ public class Player extends Sprite {
     public Rectangle rec;
 
     public int health;
+    public GameScreen screen;
 
     public Player(World world, GameScreen screen, int x, int y) {
         super(screen.getAtlas().findRegion("IDLEANIMATION"));
+        this.screen = screen;
 
         currentState = State.IDLE;
         previousState = State.IDLE;
@@ -71,6 +73,10 @@ public class Player extends Sprite {
 
         FixtureDef fdef = new FixtureDef();
         CircleShape shape = new CircleShape() ;
+
+        fdef.filter.categoryBits = screen.CATEGORY_PLAYER;
+        fdef.filter.maskBits = screen.CATEGORY_STATICOBJECTS;
+
         shape.setRadius(9 / PlantShooter.PPM * 2);
         fdef.shape = shape;
 
