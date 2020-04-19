@@ -11,7 +11,7 @@ public class EnemyGenerator {
 
     long timeSinceLastRound;
     long lastSpawn = 0;
-    public boolean inWave = false;
+    public boolean inWave;
 
     GameScreen screen;
 
@@ -25,7 +25,7 @@ public class EnemyGenerator {
         this.buyTime = buyTime;
         this.screen = screen;
     }
-    public void update(float dt) {
+    public void update() {
         long currentTime = System.currentTimeMillis();
 
         if (waveNumber> 15) { enemyStrength = 2.2f; } else if (waveNumber > 10) { enemyStrength = 2f;} else if (waveNumber > 6) { enemyStrength = 1.8f;} else if (waveNumber > 2) { enemyStrength = 1.5f;} else {enemyStrength = 1;}
