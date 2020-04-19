@@ -24,13 +24,13 @@ public class Button extends Sprite {
         texture = new Texture("Sprites/ButtonIcon.png");
         setTexture(texture);
         TextureRegion doorImage = new TextureRegion(getTexture(), 0,0, 59,30);
-        setBounds((x / PlantShooter.PPM) + camera.position.x, (y / PlantShooter.PPM), 59 * 2 / PlantShooter.PPM, 30 * 2 / PlantShooter.PPM);
+        setBounds((x / PlantShooter.PPM) + camera.position.x, (y / PlantShooter.PPM), 59 * 4 / PlantShooter.PPM, 30 * 4 / PlantShooter.PPM);
         setRegion(doorImage);
         rec = new Rectangle();
         rec.x = getX() + 6f;
         rec.y = getY();
-        rec.width = (59 * 2) / PlantShooter.PPM;
-        rec.height = (30 * 2) / PlantShooter.PPM;
+        rec.width = (59 * 4) / PlantShooter.PPM;
+        rec.height = (30 * 4) / PlantShooter.PPM;
     }
 
     public void update() {

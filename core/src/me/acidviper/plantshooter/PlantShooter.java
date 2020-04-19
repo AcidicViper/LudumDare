@@ -15,9 +15,6 @@ public class PlantShooter extends Game {
 	public BitmapFont font;
 	public static final float PPM = 100;
 
-	FreeTypeFontGenerator generator;
-	FreeTypeFontGenerator.FreeTypeFontParameter parameter;
-
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -25,10 +22,6 @@ public class PlantShooter extends Game {
 
 		setScreen(new GameScreen(this));
 
-		generator = new FreeTypeFontGenerator(Gdx.files.internal("Font.ttf"));
-		parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-		parameter.size = 5;
-		font = generator.generateFont(parameter);
 	}
 
 	@Override

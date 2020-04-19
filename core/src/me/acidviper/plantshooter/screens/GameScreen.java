@@ -3,13 +3,13 @@ package me.acidviper.plantshooter.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -29,9 +29,9 @@ import me.acidviper.plantshooter.entities.Player;
 import me.acidviper.plantshooter.generators.EnemyGenerator;
 import me.acidviper.plantshooter.objects.Button;
 import me.acidviper.plantshooter.objects.Door;
-
 import java.util.ArrayList;
 import java.util.Iterator;
+
 @SuppressWarnings("all")
 public class GameScreen implements Screen {
 
@@ -116,20 +116,16 @@ public class GameScreen implements Screen {
     boolean fireThree;
 
     public float damage = 0.5f;
-    public long fireRate = 1000;
+    public long fireRate = 600;
     public int shield = 0;
 
     long lastFire;
 
-    Sprite damageOneText;
-    Sprite damageTwoText;
-    Sprite damageThreeText;
-    Sprite shieldOneText;
-    Sprite shieldTwoText;
-    Sprite shieldThreeText;
-    Sprite fireRateOneText;
-    Sprite fireRateTwoText;
-    Sprite fireRateThreeText;
+
+    Sound failedPurchase = Gdx.audio.newSound(Gdx.files.internal("Sounds/Failed Purchase.wav"));
+    Sound purchaseSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Succed Purchase.wav"));
+    Sound plantHitSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Plant hit.wav"));
+    Sound shootSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/ShootSound.wav"));
 
     FreeTypeFontGenerator generator;
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
@@ -143,7 +139,7 @@ public class GameScreen implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1280 / PlantShooter.PPM, 720 / PlantShooter.PPM);
         viewport = new FitViewport(1280 / PlantShooter.PPM, 720 / PlantShooter.PPM, camera);
-        textViewPort = new FitViewport(200, 100);
+        textViewPort = new FitViewport(800, 480);
 
         viewport.apply();
 
@@ -159,17 +155,17 @@ public class GameScreen implements Screen {
         plant = new PlantEntity((int) (12 * PlantShooter.PPM), 200, world, this);
 
 
-        plantOneButton = new Button(-2 * PlantShooter.PPM, 300,"Shield 1", camera);
-        plantTwoButton = new Button(0 * PlantShooter.PPM, 300,"Shield 2", camera);
-        plantThreeButton = new Button(2 * PlantShooter.PPM,  300,"Shield 3", camera);
+        plantOneButton = new Button(-2 * PlantShooter.PPM, 900,"Shield 1", camera);
+        plantTwoButton = new Button(0 * PlantShooter.PPM, 900,"Shield 2", camera);
+        plantThreeButton = new Button(2 * PlantShooter.PPM,  900,"Shield 3", camera);
 
-        damageOneButton = new Button(-2 * PlantShooter.PPM, 195,"Damage 1", camera);
-        damageTwoButton = new Button(0 * PlantShooter.PPM, 195,"Damage 2", camera);
-        damageThreeButton = new Button(2 * PlantShooter.PPM,  195,"Damage 3", camera);
+        damageOneButton = new Button(-2 * PlantShooter.PPM, 500,"Damage 1", camera);
+        damageTwoButton = new Button(0 * PlantShooter.PPM, 500,"Damage 2", camera);
+        damageThreeButton = new Button(2 * PlantShooter.PPM,  500,"Damage 3", camera);
 
-        fireRateOneButton = new Button(-2 * PlantShooter.PPM, 90,"Fire 1", camera);
-        fireRateTwoButton = new Button(0 * PlantShooter.PPM, 90,"Fire 2", camera);
-        fireRateThreeButton = new Button(2 * PlantShooter.PPM, 90,"Fire 3", camera);
+        fireRateOneButton = new Button(-2 * PlantShooter.PPM, 100,"Fire 1", camera);
+        fireRateTwoButton = new Button(0 * PlantShooter.PPM, 100,"Fire 2", camera);
+        fireRateThreeButton = new Button(2 * PlantShooter.PPM, 100,"Fire 3", camera);
 
         spawnDoorTexture = new Texture("Sprites/DarkerDoor.png");
 
@@ -177,26 +173,16 @@ public class GameScreen implements Screen {
         rightSpawnDoor = new Sprite(spawnDoorTexture);
 
         leftSpawnDoor.setBounds(45 / PlantShooter.PPM,223 / PlantShooter.PPM, 41 * 2 / PlantShooter.PPM, 64 * 2 / PlantShooter.PPM);
-        rightSpawnDoor.setBounds(1830 / PlantShooter.PPM, 223 / PlantShooter.PPM, 41 * 2 / PlantShooter.PPM, 64 * 2 / PlantShooter.PPM);
+        rightSpawnDoor.setBounds(1830 / PlantShooter.PPM, 223 / PlantShooter.PPM, 41 *
+                2 / PlantShooter.PPM, 64 * 2 / PlantShooter.PPM);
 
         parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("Font.ttf"));
-        parameter.size = (int) (12);
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("Fonts/Font.ttf"));
+        parameter.minFilter = Texture.TextureFilter.Nearest;
+        parameter.magFilter = Texture.TextureFilter.Nearest;
+        parameter.size = (int) (32);
         game.font = generator.generateFont(parameter);
-
-
-         damageOneText = new Sprite();
-         damageTwoText = new Sprite();
-         damageThreeText = new Sprite();
-         shieldOneText = new Sprite();
-         shieldTwoText = new Sprite();
-         shieldThreeText = new Sprite();
-         fireRateOneText = new Sprite();
-         fireRateTwoText = new Sprite();
-         fireRateThreeText = new Sprite();
-
-
-
+        game.font.setUseIntegerPositions(true);
 
         defineWorldCollider();
         world.setContactListener(new ContactListener() {
@@ -213,10 +199,10 @@ public class GameScreen implements Screen {
                 for (Iterator i = enemyArrayList.iterator(); i.hasNext(); ) {
                     Enemy enemy = (Enemy) i.next() ;
                     if (contact.getFixtureA().getBody() == enemy.body && contact.getFixtureB().getBody() == plant.body) {
-                        if (plant.currentShield > 0) { plant.currentShield--;enemyToDelete.add(enemy); } else { plant.health--; enemyToDelete.add(enemy); }
+                        if (plant.currentShield > 0) { plant.currentShield--;enemyToDelete.add(enemy); plantHitSound.play();} else { plant.health--; enemyToDelete.add(enemy); plantHitSound.play(); }
                     }
                     if (contact.getFixtureB().getBody() == enemy.body && contact.getFixtureA().getBody() == plant.body) {
-                        if (plant.currentShield > 0) { plant.currentShield--;enemyToDelete.add(enemy); } else { plant.health--; enemyToDelete.add(enemy); }
+                        if (plant.currentShield > 0) { plant.currentShield--;enemyToDelete.add(enemy); plantHitSound.play();} else { plant.health--; enemyToDelete.add(enemy); plantHitSound.play();}
                     }
 
                         for (Bullet bullet : bulletArrayList) {
@@ -322,6 +308,19 @@ public class GameScreen implements Screen {
             enemy.update(Gdx.graphics.getDeltaTime());
             enemy.draw(game.batch);
         }
+        game.batch.end();
+        textViewPort.apply();
+        game.batch.setProjectionMatrix(textViewPort.getCamera().combined);
+        game.batch.begin();
+        game.font.setColor(Color.WHITE);
+        game.font.draw(game.batch, "Gold: " + goldCount, camera.position.x - 50, camera.position.y - 150);
+        if (mobGenerator.inWave != true) {
+            game.font.draw(game.batch, "Buy Phase!", camera.position.x - 70, camera.position.y - 200);
+        }
+        game.batch.end();
+        viewport.apply();
+        game.batch.setProjectionMatrix(viewport.getCamera().combined);
+        game.batch.begin();
 
         if (inBuyMenu) {
             player.body.setLinearVelocity(0,0);
@@ -332,33 +331,33 @@ public class GameScreen implements Screen {
             ArrayList<Button> buttons = new ArrayList<>();
 
             // PLANT SHIELD BUTTONS
-            plantOneButton.setPosition(((-2 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 300 / PlantShooter.PPM);
+            plantOneButton.setPosition(((-5 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 550 / PlantShooter.PPM);
             plantOneButton.update();
 
-            plantTwoButton.setPosition(((0 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 300 / PlantShooter.PPM);
+            plantTwoButton.setPosition(((-1 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 550 / PlantShooter.PPM);
             plantTwoButton.update();
 
-            plantThreeButton.setPosition(((2 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 300 / PlantShooter.PPM);
+            plantThreeButton.setPosition(((3 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 550 / PlantShooter.PPM);
             plantThreeButton.update();
 
             //DAMAGE
-            damageOneButton.setPosition(((-2 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 195 / PlantShooter.PPM);
+            damageOneButton.setPosition(((-5 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 360 / PlantShooter.PPM);
             damageOneButton.update();
 
-            damageTwoButton.setPosition(((0 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 195 / PlantShooter.PPM);
+            damageTwoButton.setPosition(((-1 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 360 / PlantShooter.PPM);
             damageTwoButton.update();
 
-            damageThreeButton.setPosition(((2 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 195 / PlantShooter.PPM);
+            damageThreeButton.setPosition(((3 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 360 / PlantShooter.PPM);
             damageThreeButton.update();
             // FIRE RATE
 
-            fireRateOneButton.setPosition(((-2 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 90 / PlantShooter.PPM);
+            fireRateOneButton.setPosition(((-5 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 170 / PlantShooter.PPM);
             fireRateOneButton.update();
 
-            fireRateTwoButton.setPosition(((0 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 90 / PlantShooter.PPM);
+            fireRateTwoButton.setPosition(((-1 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 170 / PlantShooter.PPM);
             fireRateTwoButton.update();
 
-            fireRateThreeButton.setPosition(((2 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 90 / PlantShooter.PPM);
+            fireRateThreeButton.setPosition(((3 * PlantShooter.PPM) / PlantShooter.PPM) + camera.position.x, 170 / PlantShooter.PPM);
             fireRateThreeButton.update();
 
             plantOneButton.draw(game.batch);
@@ -377,7 +376,43 @@ public class GameScreen implements Screen {
             textViewPort.apply();
             game.batch.setProjectionMatrix(textViewPort.getCamera().combined);
             game.batch.begin();
-            game.font.draw(game.batch, "Test", (camera.position.x), camera.position.y);
+
+            game.font.setColor(Color.GRAY);
+            Vector2 screenCoords = viewport.project(new Vector2(plantOneButton.getX(), plantOneButton.getY()));
+            Vector2 converted = textViewPort.unproject(new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y));
+            game.font.draw(game.batch, "Shield 1", (converted.x) + 25.5f, converted.y + 45.5f);
+            screenCoords = viewport.project(new Vector2(plantTwoButton.getX(), plantTwoButton.getY()));
+            converted = textViewPort.unproject(new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y));
+            game.font.draw(game.batch, "Shield 2", (converted.x) + 25.5f, converted.y + 45.5f);
+            screenCoords = viewport.project(new Vector2(plantThreeButton.getX(), plantThreeButton.getY()));
+            converted = textViewPort.unproject(new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y));
+            game.font.draw(game.batch, "Shield 3", (converted.x) + 25.5f, converted.y + 45.5f);
+
+            screenCoords = viewport.project(new Vector2(damageOneButton.getX(), damageOneButton.getY()));
+            converted = textViewPort.unproject(new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y));
+            game.font.draw(game.batch, "Damage 1", (converted.x) + 20.5f, converted.y + 45.5f);
+            screenCoords = viewport.project(new Vector2(damageTwoButton.getX(), damageTwoButton.getY()));
+            converted = textViewPort.unproject(new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y));
+            game.font.draw(game.batch, "Damage 2", (converted.x) + 20.5f, converted.y + 45.5f);
+            screenCoords = viewport.project(new Vector2(damageThreeButton.getX(), damageThreeButton.getY()));
+            converted = textViewPort.unproject(new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y));
+            game.font.draw(game.batch, "Damage 3", (converted.x) + 20.5f, converted.y + 45.5f);
+
+            screenCoords = viewport.project(new Vector2(fireRateOneButton.getX(), fireRateOneButton.getY()));
+            converted = textViewPort.unproject(new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y));
+            game.font.draw(game.batch, "Fire Rate", (converted.x) + 17.5f, converted.y + 50.5f);
+            game.font.draw(game.batch, "1", (converted.x) + ((fireRateOneButton.getRegionWidth() / 2f) * 2.5f), converted.y + 34.5f);
+
+            screenCoords = viewport.project(new Vector2(fireRateTwoButton.getX(), fireRateTwoButton.getY()));
+            converted = textViewPort.unproject(new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y));
+            game.font.draw(game.batch, "Fire Rate", (converted.x) + 17.5f, converted.y + 50.5f);
+            game.font.draw(game.batch, "2", (converted.x) + ((fireRateTwoButton.getRegionWidth() / 2f) * 2.5f), converted.y + 34.5f);
+
+            screenCoords = viewport.project(new Vector2(fireRateThreeButton.getX(), fireRateThreeButton.getY()));
+            converted = textViewPort.unproject(new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y));
+            game.font.draw(game.batch, "Fire Rate", (converted.x) + 17.5f, converted.y + 50.5f);
+            game.font.draw(game.batch, "3", (converted.x) + ((fireRateThreeButton.getRegionWidth() / 2f) * 2.5f), converted.y + 34.5f);
+
             game.batch.end();
             viewport.apply();
             game.batch.setProjectionMatrix(viewport.getCamera().combined);
@@ -399,47 +434,34 @@ public class GameScreen implements Screen {
                 if(mouseRectangle.overlaps(button.rec)) {
                     if (Gdx.input.justTouched()) {
 
-                        if (button.text.contains("Shield") && button.text.contains("1") && goldCount >= 5) {
-                            shieldOne = true;
-                            goldCount -= 5;
+                        if (button.text.contains("Shield") && button.text.contains("1")) {
+                            if (goldCount >= 5 && !shieldOne) { shieldOne = true; goldCount -= 5; purchaseSound.play(); } else { failedPurchase.play(); }
                         }
-                        if (button.text.contains("Shield") && button.text.contains("2")  && goldCount >= 15 && shieldOne) {
-                            shieldTwo = true;
-                            goldCount -= 15;
+                        if (button.text.contains("Shield") && button.text.contains("2")) {
+                            if (goldCount >= 15 && shieldOne && !shieldTwo) { shieldTwo = true; goldCount -= 15; purchaseSound.play(); } else {failedPurchase.play();  }
                         }
-                        if (button.text.contains("Shield") && button.text.contains("3") && goldCount >= 35 && shieldTwo) {
-                            shieldThree = true;
-                            goldCount -= 35;
+                        if (button.text.contains("Shield") && button.text.contains("3")) {
+                            if (goldCount >= 35  && shieldTwo && !shieldThree) { shieldThree = true; goldCount -= 35; purchaseSound.play(); } else { failedPurchase.play();}
                         }
 
-
-
-                        if (button.text.contains("Damage") && button.text.contains("1") && goldCount >= 5) {
-                            damageOne = true;
-                            goldCount -= 5;
+                        if (button.text.contains("Damage") && button.text.contains("1")) {
+                            if (goldCount >= 5 && !damageOne) { damageOne = true; goldCount -= 5; purchaseSound.play();} else {failedPurchase.play(); }
                         }
-                        if (button.text.contains("Damage") && button.text.contains("2") && goldCount >= 15 && damageOne) {
-                            damageTwo = true;
-                            goldCount -= 15;
+                        if (button.text.contains("Damage") && button.text.contains("2")) {
+                            if (goldCount >= 15  && damageOne && !damageTwo)  { damageTwo = true; goldCount -= 15; purchaseSound.play(); } else {failedPurchase.play(); }
                         }
-                        if (button.text.contains("Damage") && button.text.contains("3") && goldCount >= 35 && damageTwo) {
-                            damageThree = true;
-                            goldCount -= 35;
+                        if (button.text.contains("Damage") && button.text.contains("3")) {
+                            if (goldCount >= 35  && damageTwo && !damageThree) { damageThree = true; goldCount -= 35; purchaseSound.play();} else {failedPurchase.play(); }
                         }
 
-
-
-                        if (button.text.contains("Fire") && button.text.contains("1") && goldCount >= 5) {
-                            fireOne = true;
-                            goldCount -= 5;
+                        if (button.text.contains("Fire") && button.text.contains("1")) {
+                            if (goldCount >= 5 && !fireOne) { fireOne = true; goldCount -= 5; purchaseSound.play(); } else {failedPurchase.play(); }
                         }
-                        if (button.text.contains("Fire") && button.text.contains("2") && goldCount >= 15 && fireOne) {
-                            fireTwo = true;
-                            goldCount -= 15;
+                        if (button.text.contains("Fire") && button.text.contains("2")) {
+                            if (goldCount >= 15  && fireOne && !fireTwo) { fireTwo = true; goldCount -= 15; purchaseSound.play();} else {failedPurchase.play(); }
                         }
-                        if (button.text.contains("Fire") && button.text.contains("3") && goldCount >= 35 && fireTwo) {
-                            fireThree = true;
-                            goldCount -= 35;
+                        if (button.text.contains("Fire") && button.text.contains("3")) {
+                            if (goldCount >= 35  && fireTwo && !fireThree) { fireThree = true; goldCount -= 35; purchaseSound.play();} else { failedPurchase.play();}
                         }
 
                     }
@@ -451,7 +473,13 @@ public class GameScreen implements Screen {
         game.batch.end();
     }
     public void update(float dt) {
+
+        if (damageThree) { damage = 3; } else if (damageTwo) { damage = 1.5f; } else if (damageOne) { damage = 1; }
+        if (fireThree) { fireRate = 100; } else if (fireTwo) { fireRate = 200;} else if (fireOne) { fireRate = 400;}
+        if (shieldThree) { shield = 3;} else if (shieldTwo) { shield = 2;} else if (shieldOne) { shield = 1;}
+
         long currentTime = System.currentTimeMillis();
+        boolean closedThisFrame = false;
         touchingLeftDoor = false; touchingRightDoor = false;
         if (player.rec.overlaps(leftDoor.rec)) { touchingLeftDoor = true; }
         if (player.rec.overlaps(rightDoor.rec)) { touchingRightDoor = true; }
@@ -461,7 +489,8 @@ public class GameScreen implements Screen {
 
         if (mobGenerator.inWave && inBuyMenu) { inBuyMenu = false; }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && !mobGenerator.inWave) { inBuyMenu = true; }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && inBuyMenu) {inBuyMenu = false; closedThisFrame = true; }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && !mobGenerator.inWave && !closedThisFrame) { inBuyMenu = true; }
         Iterator iter = enemyArrayList.iterator();
         while (iter.hasNext()) {
             Enemy enemy = (Enemy) iter.next();
@@ -491,8 +520,10 @@ public class GameScreen implements Screen {
             if (currentTime - lastFire >= fireRate) {
                 if (player.runningRight) {
                     bulletArrayList.add(new Bullet((player.getX() + .8f) * PlantShooter.PPM, (player.getY() + .2f) * PlantShooter.PPM, player.runningRight, world, this));
+                    shootSound.play();
                 } else {
                     bulletArrayList.add(new Bullet((player.getX() - .2f) * PlantShooter.PPM, (player.getY() + .2f) * PlantShooter.PPM, player.runningRight, world, this));
+                    shootSound.play();
                 }
                 lastFire = currentTime;
             }
