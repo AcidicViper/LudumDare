@@ -3,6 +3,7 @@ package me.acidviper.plantshooter.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -41,7 +42,7 @@ public class GameScreen implements Screen {
     public final short CATEGORY_MONSTERSTATICOBJECTS = 0x0004; // Something in binary I bet
     public final short CATEGORY_BULLETS = 0x0005; // Something in binary I bet
 
-    PlantShooter game;
+    public PlantShooter game;
 
     OrthographicCamera camera;
     FitViewport viewport;
@@ -85,7 +86,7 @@ public class GameScreen implements Screen {
 
     Rectangle rect = new Rectangle();
 
-    EnemyGenerator mobGenerator = new EnemyGenerator(1, 10000, this, false);
+    public  EnemyGenerator mobGenerator = new EnemyGenerator(1, 10000, this, false);
 
     public int goldCount = 0;
 
@@ -124,14 +125,19 @@ public class GameScreen implements Screen {
 
     Sound failedPurchase = Gdx.audio.newSound(Gdx.files.internal("Sounds/Failed Purchase.wav"));
     Sound purchaseSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Succed Purchase.wav"));
-    Sound plantHitSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Plant hit.wav"));
-    Sound shootSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/ShootSound.wav"));
+    Sound plantHitSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/BiteNoise.wav"));
+    Sound shootSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Laser_Shoot4.wav"));
+    Music backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/JamSong.wav"));
 
     FreeTypeFontGenerator generator;
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
 
     public GameScreen(PlantShooter game) {
         this.game = game;
+
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.1f);
+        backgroundMusic.play();
 
         atlas = new TextureAtlas("Animations/PlantShooterGame.atlas");
         enemyAtlas = new TextureAtlas("Animations/EnemyPlantShooterGame.atlas");
@@ -317,6 +323,9 @@ public class GameScreen implements Screen {
         if (mobGenerator.inWave != true) {
             game.font.draw(game.batch, "Buy Phase!", camera.position.x - 70, camera.position.y - 200);
         }
+        game.font.draw(game.batch, "Wave: " + mobGenerator.waveNumber, camera.position.x - 250, camera.position.y - 150);
+        game.font.draw(game.batch, "Plant Health: " + plant.health, camera.position.x + 100, camera.position.y - 150);
+        game.font.draw(game.batch, "Plant Shield: " + plant.currentShield, camera.position.x + 100, camera.position.y - 180);
         game.batch.end();
         viewport.apply();
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
@@ -516,15 +525,10 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && !inBuyMenu && player.canJump) { player.body.applyLinearImpulse(new Vector2(0 , 4), player.body.getWorldCenter(), true ); player.canJump = false;}
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && !inBuyMenu  && player.body.getLinearVelocity().x <= 2) { player.body.applyLinearImpulse(new Vector2(0.1f , 0), player.body.getWorldCenter(), true ); }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && !inBuyMenu  && player.body.getLinearVelocity().x >= -2) { player.body.applyLinearImpulse(new Vector2(-0.1f , 0f), player.body.getWorldCenter(), true ); }
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.X)) {
             if (currentTime - lastFire >= fireRate) {
-                if (player.runningRight) {
-                    bulletArrayList.add(new Bullet((player.getX() + .8f) * PlantShooter.PPM, (player.getY() + .2f) * PlantShooter.PPM, player.runningRight, world, this));
-                    shootSound.play();
-                } else {
-                    bulletArrayList.add(new Bullet((player.getX() - .2f) * PlantShooter.PPM, (player.getY() + .2f) * PlantShooter.PPM, player.runningRight, world, this));
-                    shootSound.play();
-                }
+                if (player.runningRight) { bulletArrayList.add(new Bullet((player.getX() + .8f) * PlantShooter.PPM, (player.getY() + .2f) * PlantShooter.PPM, player.runningRight, world, this));shootSound.play();
+                } else { bulletArrayList.add(new Bullet((player.getX() - .2f) * PlantShooter.PPM, (player.getY() + .2f) * PlantShooter.PPM, player.runningRight, world, this));shootSound.play(); }
                 lastFire = currentTime;
             }
         }
@@ -532,6 +536,35 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
+         game.dispose();
+         renderer.dispose();
+         map.dispose();
+         world.dispose();
+         Box2dDebugRenderer.dispose();
+         atlas.dispose();
+         enemyAtlas.dispose();
+         plant.getTexture().dispose();
+         leftDoor.getTexture().dispose();
+         rightDoor.getTexture().dispose();
+         leftSpawnDoor.getTexture().dispose();
+         rightSpawnDoor.getTexture().dispose();
+         spawnDoorTexture.dispose();
+         failedPurchase.dispose();
+         purchaseSound.dispose();
+         plantHitSound.dispose();
+         shootSound.dispose();
+         backgroundMusic.dispose();;
+         generator.dispose();
+         plantOneButton.getTexture().dispose();
+         plantTwoButton.getTexture().dispose();
+         plantThreeButton.getTexture().dispose();
+         damageOneButton.getTexture().dispose();
+         damageTwoButton.getTexture().dispose();
+         damageThreeButton.getTexture().dispose();
+         fireRateOneButton.getTexture().dispose();
+         fireRateTwoButton.getTexture().dispose();
+         fireRateThreeButton.getTexture().dispose();
+         player.getTexture().dispose();
     }
     public TextureAtlas getAtlas() {
         return atlas;

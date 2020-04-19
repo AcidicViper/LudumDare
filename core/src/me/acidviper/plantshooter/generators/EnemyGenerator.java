@@ -17,6 +17,8 @@ public class EnemyGenerator {
 
     int enemiesToSpawnInWave =0;
 
+    float enemyStrength;
+
     public EnemyGenerator(int waveNumber, int buyTime, GameScreen screen, boolean inWave) {
         this.inWave = inWave;
         this.waveNumber = waveNumber;
@@ -25,18 +27,21 @@ public class EnemyGenerator {
     }
     public void update(float dt) {
         long currentTime = System.currentTimeMillis();
+
+        if (waveNumber> 15) { enemyStrength = 2.2f; } else if (waveNumber > 10) { enemyStrength = 2f;} else if (waveNumber > 6) { enemyStrength = 1.8f;} else if (waveNumber > 2) { enemyStrength = 1.5f;} else {enemyStrength = 1;}
+
         if (inWave) {
             timeSinceLastRound = currentTime;
-            if (enemiesToSpawnInWave < 1) { inWave = false; System.out.println("End of wave!"); return;}
+            if (enemiesToSpawnInWave < 1) { waveNumber += 1; inWave = false; return;}
             if (currentTime - lastSpawn >= 1200) {
                 lastSpawn = currentTime;
                 Random random = new Random();
                 if (random.nextBoolean()) {
-                    screen.enemyArrayList.add(new Enemy(25,250, screen.world,screen, true));
+                    screen.enemyArrayList.add(new Enemy(25,250, screen.world,screen, true, enemyStrength));
                     enemiesToSpawnInWave--;
                 } else {
                     enemiesToSpawnInWave --;
-                    screen.enemyArrayList.add(new Enemy(2000,250, screen.world,screen, false));
+                    screen.enemyArrayList.add(new Enemy(2000,250, screen.world,screen, false, enemyStrength));
                 }
             }
         }

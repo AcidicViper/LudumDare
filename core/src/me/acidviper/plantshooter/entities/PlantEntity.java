@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import me.acidviper.plantshooter.PlantShooter;
+import me.acidviper.plantshooter.screens.GameOverScreen;
 import me.acidviper.plantshooter.screens.GameScreen;
 
 public class PlantEntity extends Sprite {
@@ -44,5 +45,8 @@ public class PlantEntity extends Sprite {
     }
     public void update(float dt) {
         setPosition( (body.getPosition().x - getWidth() / 2) - (1 / PlantShooter.PPM)  + .05f, (body.getPosition().y - getHeight() / 2)  - ( 2 / PlantShooter.PPM) + 1.5f);
+        if (health < 1) {
+            screen.game.setScreen(new GameOverScreen(screen.game, screen.mobGenerator.waveNumber));
+        }
     }
 }

@@ -19,22 +19,28 @@ public class Enemy extends Sprite {
 
     private float stateTimer;
     public boolean runningRight;
+    public boolean facingRight;
 
     public int health = 2;
+    public float speed = 1.2f;
 
     World world;
     public Body body;
 
     GameScreen screen;
 
-    public Enemy(float x, float y, World world, GameScreen screen, boolean goLeft) {
+    public Enemy(float x, float y, World world, GameScreen screen, boolean goLeft, float Strength) {
         super(screen.getEnemyAtlas().findRegion("IDLEANIMATION"));
         this.screen = screen;
         currentState = State.RUNNING;
         previousState = State.RUNNING;
 
+        health *= Strength;
+        speed *= Strength;
+
         stateTimer = 0;
         runningRight = goLeft;
+
 
         Array<TextureRegion> frames = new Array<>();
         for (int i = 5; i < 7; i++) {
@@ -71,6 +77,7 @@ public class Enemy extends Sprite {
     public void update(float dt) {
         setPosition( (body.getPosition().x - getWidth() / 2) - (1 / PlantShooter.PPM)  + .05f, (body.getPosition().y - getHeight() / 2)  - ( 2 / PlantShooter.PPM) + 0.15f);
         setRegion(getFrame(dt));
+
         if (runningRight) { body.setLinearVelocity(3f , 0f); } else {body.setLinearVelocity(-3f , 0f);}
     }
     public TextureRegion getFrame(float dt) {
@@ -90,6 +97,7 @@ public class Enemy extends Sprite {
             region.flip(true, false);
             runningRight = true;
         }
+
         stateTimer = currentState == previousState ? stateTimer + dt : 0;
         previousState = currentState;
         return region;
