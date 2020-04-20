@@ -154,7 +154,6 @@ public class GameScreen implements Screen {
         renderer = new OrthogonalTiledMapRenderer(map ,  1 / PlantShooter.PPM);
 
         world = new World(new Vector2(0,-10), true);
-        Box2dDebugRenderer = new Box2DDebugRenderer();
 
         player = new Player(world,this, (int) (10 * PlantShooter.PPM),400);
 
@@ -291,7 +290,6 @@ public class GameScreen implements Screen {
         camera.update();
         renderer.setView(camera);
         renderer.render();
-        Box2dDebugRenderer.render(world, camera.combined);
         viewport.apply();
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
         game.batch.begin();
@@ -505,7 +503,6 @@ public class GameScreen implements Screen {
             Enemy enemy = (Enemy) iter.next();
             if (enemy.health < 1) { iter.remove(); goldCount++; enemyToDelete.add(enemy); }
         }
-
         player.update(Gdx.graphics.getDeltaTime());
         plant.update(Gdx.graphics.getDeltaTime());
         world.step(1/60f, 6,2);
