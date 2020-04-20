@@ -25,6 +25,7 @@ public class EnemyGenerator {
         this.buyTime = buyTime;
         this.screen = screen;
     }
+
     public void update() {
         long currentTime = System.currentTimeMillis();
 

@@ -509,7 +509,7 @@ public class GameScreen implements Screen {
         player.update(Gdx.graphics.getDeltaTime());
         plant.update(Gdx.graphics.getDeltaTime());
         world.step(1/60f, 6,2);
-        mobGenerator.update(Gdx.graphics.getDeltaTime());
+        mobGenerator.update();
         for (Bullet bullet : bulletToDelete) {
             world.destroyBody(bullet.body);
         }

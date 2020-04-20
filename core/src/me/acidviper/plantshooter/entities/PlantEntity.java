@@ -45,8 +45,27 @@ public class PlantEntity extends Sprite {
     }
     public void update(float dt) {
         setPosition( (body.getPosition().x - getWidth() / 2) - (1 / PlantShooter.PPM)  + .05f, (body.getPosition().y - getHeight() / 2)  - ( 2 / PlantShooter.PPM) + 1.5f);
+
         if (health < 1) {
             screen.game.setScreen(new GameOverScreen(screen.game, screen.mobGenerator.waveNumber));
+        }
+
+        if (health < 12) {
+            setTexture(new Texture("Sprites/PlantSecondPhase.png"));
+            plantIdle = new TextureRegion(getTexture(), 0,0, 124,124);
+            setRegion(plantIdle);
+        }
+
+        if (health < 6) {
+            setTexture(new Texture("Sprites/ThirdPhasePlantSprite.png"));
+            plantIdle = new TextureRegion(getTexture(), 0,0, 124,124);
+            setRegion(plantIdle);
+        }
+
+        if (health < 3) {
+            setTexture(new Texture("Sprites/FinalPlantStage.png"));
+            plantIdle = new TextureRegion(getTexture(), 0,0, 124,124);
+            setRegion(plantIdle);
         }
     }
 }

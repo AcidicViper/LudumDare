@@ -38,7 +38,7 @@ public class GameOverScreen implements Screen {
         game.font.setColor(Color.WHITE);
         game.batch.draw(texture, 0,0, 1280, 720);
         game.font.draw(game.batch, "Thank you for playing my LD Game", camera.position.x - 600,  camera.position.y);
-        game.font.draw(game.batch, "You survived " + wavesSurvived + " rounds.", camera.position.x - 450, camera.position.y - 100);
+        game.font.draw(game.batch, "You survived " + wavesSurvived + " waves.", camera.position.x - 450, camera.position.y - 100);
 
         game.batch.end();
     }
